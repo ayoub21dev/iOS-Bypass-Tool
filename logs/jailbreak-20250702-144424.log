@@ -1,0 +1,11 @@
+Log file for this session: logs/jailbreak-20250702-144424.log
+-------------------------------------
+[0;34m[INFO] Running with root privileges.[0m
+[0;34m[INFO] Detecting architecture...[0m
+[0;32m[SUCCESS] Architecture detected: x86_64[0m
+[0;32m[SUCCESS] palera1n binary already exists. Skipping download.[0m
+[0;32m[SUCCESS] ------------------------------------------------[0m
+[0;32m[SUCCESS]   palera1n is ready to use.                     [0m
+[0;32m[SUCCESS] ------------------------------------------------[0m
+[1;33m[WARNING] IMPORTANT: The next step will start the jailbreak.[0m
+--> Press [Enter] when you are ready to begin...

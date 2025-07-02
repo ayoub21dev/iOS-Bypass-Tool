@@ -1,0 +1,14 @@
+Log file for this session: logs/bypass-20250702-123841.log
+-------------------------------------
+[0;34m[INFO] Running with root privileges.[0m
+[0;32m[SUCCESS] SSH_RD script already exists. Skipping download.[0m
+[1;33m[WARNING] IMPORTANT: The device should be in DFU mode for this step.[0m
+--> Press [Enter] to start the SSH Ramdisk and Bypass process...[1;33m[WARNING] [SIMULATION] Pretending to build and boot SSH Ramdisk...[0m
+[0;34m[INFO] [SIMULATION] Pretending to connect via SSH and apply bypass...[0m
+[1;33m[WARNING] [SIMULATION] Would run the following commands on the device:[0m
+   -> mount -uw /mnt6/
+   -> mount -uw /mnt1/
+   -> mv /mnt6/Applications/Setup.app /mnt6/Applications/Setup.app.bak
+   -> rm -rf /mnt1/mobile/Library/Accounts/
+   -> reboot
+[0;32m[SUCCESS] Bypass script completed! The device should reboot into the Home Screen.[0m

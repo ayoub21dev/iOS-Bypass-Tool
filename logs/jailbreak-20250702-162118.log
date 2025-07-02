@@ -1,0 +1,29 @@
+Log file for this session: logs/jailbreak-20250702-162118.log
+-------------------------------------
+[0;34m[INFO] Running with root privileges.[0m
+[0;34m[INFO] Detecting architecture...[0m
+[0;32m[SUCCESS] Architecture detected: x86_64[0m
+[0;32m[SUCCESS] palera1n binary already exists. Skipping download.[0m
+[0;32m[SUCCESS] ------------------------------------------------[0m
+[0;32m[SUCCESS]   palera1n is ready to use.                     [0m
+[0;32m[SUCCESS] ------------------------------------------------[0m
+[1;33m[WARNING] IMPORTANT: The next step will start the jailbreak.[0m
+--> Press [Enter] when you are ready to begin...[0;34m[INFO] Starting palera1n with mode: --fakefs[0m
+#
+# palera1n: v2.0.2 
+#
+# ========  Made by  =======
+# Made by: Nick Chan, Ploosh, Khcrysalis, Mineek, staturnz, kok3shidoll, HAHALOSAH 
+# ======== Thanks to =======
+# Thanks to: llsc12, Nebula, Lrdsnow, nikias (libimobiledevice),
+# checkra1n team (Siguza, axi0mx, littlelailo et al.),
+# Procursus Team (Hayden Seay, Cameron Katri, Keto et.al)
+# ==========================
+
+ - [0m[[0;90m07/02/25 16:21:22[0m] [1;36m<Info>[0m: [0;36mWaiting for devices[0m
+ - [0m[[0;90m07/02/25 16:21:22[0m] [1;33m<Warning>[0m: [0;33m/var/run/usbmuxd not found, normal mode device detection will not work.[0m
+ - [0m[[0;90m07/02/25 16:22:51[0m] [1;36m<Info>[0m: [0;36mPress Enter when ready for DFU mode[0m
+[1;36m[KHold volume down + side button (4)[0m[1;36m[KHold volume down + side button (3)[0m[0;36mHold volume down + side button (2)[0m[K[1;36m[KHold volume down + side button (2)[0m[1;36m[KHold volume down + side button (1)[0m[0;36mHold volume down + side button (0)[0m
+[1;36m[KHold volume down button (10)[0m[1;36m[KHold volume down button (9)[0m[1;36m[KHold volume down button (8)[0m[1;36m[KHold volume down button (7)[0m[1;36m[KHold volume down button (6)[0m[1;36m[KHold volume down button (5)[0m[1;36m[KHold volume down button (4)[0m[1;36m[KHold volume down button (3)[0m[1;36m[KHold volume down button (2)[0m[1;36m[KHold volume down button (1)[0m[0;36mHold volume down button (0)[0m
+ - [0m[[0;90m07/02/25 16:23:13[0m] [1;33m<Warning>[0m: [0;33mWhoops, device did not enter DFU mode[0m
+ - [0m[[0;90m07/02/25 16:23:13[0m] [1;36m<Info>[0m: [0;36mWaiting for device to reconnect...[0m
