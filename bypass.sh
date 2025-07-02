@@ -2,8 +2,8 @@
 
 # ==============================================================================
 # Bypass Script for iOS-Bypass-Tool
-# Coded by: Ayoub &
-# Version: 7.0 - The Professional
+# Coded by: Ayoub
+# Version: 7.1 - The Passcode & Activation Fix
 # ==============================================================================
 
 # --- Strict Mode & Safety Net ---
@@ -58,18 +58,36 @@ info "Step 1: Building the SSH Ramdisk..."
 info "Step 2: Booting the SSH Ramdisk..."
 ./"$SSH_RD_SCRIPT" boot
 
-info "Step 3: Connecting via SSH and renaming Setup.app..."
+info "Step 3: Connecting via SSH and applying bypass..."
 # The ssh-rd script opens a tunnel on port 2222.
 ssh -p 2222 -o "StrictHostKeyChecking=no" -o "UserKnownHostsFile=/dev/null" root@localhost << EOF
+# --- Mount filesystems ---
+echo "Mounting filesystems..."
 mount -uw /mnt6/
+mount -uw /mnt1/
+
+# --- Bypass 1: Activation Lock (Hello Screen) ---
+echo "Attempting to bypass Activation Lock..."
 if [ -d "/mnt6/Applications/Setup.app" ]; then
     mv /mnt6/Applications/Setup.app /mnt6/Applications/Setup.app.bak
-    echo "Setup.app has been renamed. Rebooting..."
-    reboot
+    echo "-> Setup.app renamed successfully."
 else
-    echo "Setup.app not found. It might have been already bypassed. Rebooting..."
-    reboot
+    echo "-> Setup.app not found, already bypassed?"
 fi
+
+# --- Bypass 2: Passcode Lock --- ### THIS IS THE NEW, CRITICAL PART ###
+echo "Attempting to bypass Passcode lock..."
+ACCOUNTS_DIR="/mnt1/mobile/Library/Accounts/"
+if [ -d "$ACCOUNTS_DIR" ]; then
+    rm -rf "$ACCOUNTS_DIR"
+    echo "-> Accounts directory deleted successfully."
+else
+    echo "-> Accounts directory not found."
+fi
+
+# --- Finalizing ---
+echo "Bypass applied! Rebooting device..."
+reboot
 EOF
 
 success "Bypass script completed! The device will reboot into the Home Screen."
